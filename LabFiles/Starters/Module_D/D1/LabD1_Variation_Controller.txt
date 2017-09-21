@@ -1,0 +1,23 @@
+
+ public ActionResult AddToCart(ShirtVariation currentContent, decimal Quantity, string Monogram) 
+        {
+            // ToDo: (lab D1) add a LineItem to the Cart
+
+
+
+	    // if we want to redirect
+            ContentReference cartRef = _contentLoader.Get<StartPage>(ContentReference.StartPage).Settings.cartPage;
+            CartPage cartPage = _contentLoader.Get<CartPage>(cartRef);
+            var name = cartPage.Name;
+            var lang = ContentLanguage.PreferredCulture;
+	    string passingValue = cart.Name;
+
+            // go to the cart page, if needed
+            return RedirectToAction("Index", lang + "/" + name, new { passedAlong = passingValue });  
+	}
+
+
+ public void AddToWishList(ShirtVariant currentContent)
+        {
+
+	}
