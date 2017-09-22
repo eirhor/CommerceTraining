@@ -1,0 +1,21 @@
+﻿@using EPiServer.Core
+@using EPiServer.Web.Mvc.Html
+
+@model CommerceFundamentalsWeb.Models.ViewModels.BlouseProductViewModel
+
+<div>
+    @Html.PropertyFor(m => m.CurrentContent.Code)
+    @Html.PropertyFor(m => m.CurrentPage.Name)
+</div>
+<div>
+    <ul>
+        @foreach (var item in Model.ProductVariations)
+        {
+            <li> @item.Code</li>
+        }
+    </ul>
+</div>
+<div>
+    Here you will find all our interesting campaigns:
+    @Html.ContentLink(Model.CampaignLink)
+</div>

@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
 using EPiServer;
+using EPiServer.Commerce.Catalog.ContentTypes;
 using EPiServer.Core;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
@@ -25,8 +27,7 @@ namespace CommerceFundamentalsWeb.Controllers
             _contentLoader = contentLoader;
             _urlResolver = urlResolver;
 
-            // uncomment the below when the catalog is modelled
-            // topCategory = contentLoader.Get<StartPage>(PageReference.StartPage).Settings.topCategory;
+            topCategory = contentLoader.Get<StartPage>(ContentReference.StartPage).Settings.topCategory;
         }
 
         public string GetUrl(ContentReference contentReference)
@@ -41,8 +42,7 @@ namespace CommerceFundamentalsWeb.Controllers
                 MainBodyStartPage = currentPage.MainBody,
                 myPageChildren = _contentLoader.GetChildren<IContent>(currentPage.ContentLink),
                 
-                // uncomment the below when the catalog is modelled
-                //topLevelCategories = _contentLoader.GetChildren<CatalogContentBase>(topCategory).OfType<NodeContent>(),
+                topLevelCategories = _contentLoader.GetChildren<CatalogContentBase>(topCategory).OfType<NodeContent>(),
             };
 
             return View(model);

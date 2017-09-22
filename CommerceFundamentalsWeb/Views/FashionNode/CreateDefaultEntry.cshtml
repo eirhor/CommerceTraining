@@ -1,0 +1,11 @@
+﻿@model CommerceFundamentalsWeb.Models.ViewModels.NewBlouseObject
+
+@using (Html.BeginForm("CreateDefaultEntry",null,FormMethod.Post))
+{
+    @Html.HiddenFor(m=>m.Code)
+    <span>Name:</span>@Html.TextBox("newname")<br/>
+    <span>Code:</span>@Html.TextBox("newcode")<br />
+    <span>Color:</span>@Html.TextBox("color")<br/>
+    <span>Sizes:</span>@Html.TextBox("sizes")
+    <input type="submit"/>
+}
