@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Pages;
+using CommerceFundamentalsWeb.Models.ViewModels;
 using EPiServer;
 using EPiServer.Commerce.Marketing;
 using EPiServer.Commerce.Order;
@@ -49,12 +50,34 @@ namespace CommerceFundamentalsWeb.Controllers
         }
         public ActionResult Index(CartPage currentPage)
         {
-            // ToDo: (lab D2)
+            CartViewModel model = new CartViewModel();
+            var contactId = GetContactId();
+            var cart = _orderRepository.LoadCart<ICart>(contactId,DefaultCartName);
 
+            if (cart == null)
+            {
+                return View("NoCart");
+            }
+            else
+            {
+                var warningMessages = ValidateCart(cart);
 
+                if (string.IsNullOrEmpty(warningMessages))
+                {
+                    warningMessages = "No Messages";
+                }
 
+                _promotionEngine.Run(cart);
+
+                
+                model.LineItems = cart.GetAllLineItems();
+                model.SubTotal = _orderGroupCalculator.GetSubTotal(cart);
+                model.WarningMessage = warningMessages;
+
+                _orderRepository.Save(cart);
+            }
             // The below is a dummy, remove when lab D2 is done
-            return null;
+            return View(model);
         }
 
         public ActionResult Checkout()

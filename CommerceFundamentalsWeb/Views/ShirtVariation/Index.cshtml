@@ -6,3 +6,27 @@
     Price <strong>@Model.PriceString</strong>
     @Html.CheckBoxFor(x => x.CanBeMonogrammed) <span>can be monogrammed</span>
 </div>
+
+<div>
+    @using (Html.BeginForm("AddToCart", null))
+    {
+        <div>
+            Quantity: <input type="text" name="Quantity" value="1" />
+        </div>
+        <div>
+            Monogram: <input type="text" name="Monogram" />
+        </div>
+        <div>
+            <input type="submit" value="Add to cart" />
+        </div>
+    }
+</div>
+
+<div>
+    @using (Html.BeginForm("AddToWishList", null))
+    {
+        <div>
+            <input type="submit" value="Add to wishlist" />
+        </div>
+    }
+</div>

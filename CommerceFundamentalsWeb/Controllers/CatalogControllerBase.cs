@@ -16,7 +16,7 @@ namespace CommerceFundamentalsWeb.Controllers
 {
     public class CatalogControllerBase<T> : ContentController<T> where T : CatalogContentBase
     {
-        private readonly IContentLoader _contentLoader;
+        protected readonly IContentLoader _contentLoader;
         private readonly UrlResolver _urlResolver;
         private readonly AssetUrlResolver _assetUrlResolver;
         private readonly ThumbnailUrlResolver _thumbnailUrlResolver;
