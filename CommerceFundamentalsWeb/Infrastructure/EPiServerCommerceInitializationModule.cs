@@ -1,9 +1,11 @@
 using System.Web.Mvc;
 using System.Web.Routing;
+using CommerceFundamentalsWeb.Business.Pricing;
 using EPiServer.Commerce.Routing;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using EPiServer.ServiceLocation;
+using Mediachase.Commerce.Pricing;
 
 namespace CommerceFundamentalsWeb.Infrastructure
 {
@@ -25,6 +27,7 @@ namespace CommerceFundamentalsWeb.Infrastructure
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
             DependencyResolver.SetResolver(new StructureMapDependencyResolver(context.StructureMap()));
+            context.StructureMap().Configure(x=>x.For<IPriceService>().Use<RandomPriceService>());
         }
     }
 }
