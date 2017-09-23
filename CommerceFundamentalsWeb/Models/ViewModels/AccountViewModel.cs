@@ -1,7 +1,13 @@
-﻿namespace CommerceFundamentalsWeb.Models.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CommerceFundamentalsWeb.Models.ViewModels
 {
     public class AccountViewModel
     {
-        // fill this up for the lab
+        public string UserName { get; set; }
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

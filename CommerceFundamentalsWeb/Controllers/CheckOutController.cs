@@ -310,7 +310,7 @@ namespace CommerceFundamentalsWeb.Controllers
                 {
                     // no pref. address set... so we set one for the contact
                     CustomerAddress newCustAddress =
-                        CustomerAddress.CreateForApplication(Mediachase.Commerce.Core.AppContext.Current.ApplicationId);
+                    CustomerAddress.CreateForApplication();
                     newCustAddress.AddressType = CustomerAddressTypeEnum.Shipping | CustomerAddressTypeEnum.Public; // mandatory
                     newCustAddress.ContactId = CustomerContext.Current.CurrentContact.PrimaryKeyId;
                     newCustAddress.CountryCode = "SWE";

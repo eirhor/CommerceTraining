@@ -8,6 +8,7 @@ using EPiServer;
 using EPiServer.Core;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
+using Mediachase.Commerce.Core;
 using Mediachase.Commerce.Customers;
 using Mediachase.Commerce.Customers.Profile;
 using Mediachase.Commerce.Security;
@@ -33,36 +34,84 @@ namespace CommerceFundamentalsWeb.Controllers
             return View(model);
         }
 
-        public ActionResult Login(AccountPage currentPage, string userName, string passWord)
+        public ActionResult Login(AccountPage currentPage, AccountViewModel model)
         {
-            if (Membership.ValidateUser(userName, passWord))
+            if (Membership.ValidateUser(model.UserName, model.Password))
             {
-                MembershipUser account = Membership.GetUser(userName);
-                if (userName != null)
+                var url = _urlResolver.GetUrl(ContentReference.StartPage);
+                MembershipUser account = Membership.GetUser(model.UserName);
+                if (account != null)
                 {
                     var profile = SecurityContext.Current.CurrentUserProfile as CustomerProfileWrapper;
                     if (profile != null)
                     {
-                        CreateAuthenticationCookie(ControllerContext.HttpContext, userName, Mediachase.Commerce.Core.AppContext.Current.ApplicationName, false);
-                        //return Redirect(url);
+                        CreateAuthenticationCookie(ControllerContext.HttpContext, model.UserName,
+                            Mediachase.Commerce.Core.AppContext.Current.ApplicationName, false);
+                        return Redirect(url);
                     }
                 }
             }
-
-            // ...just for a check
-            return RedirectToAction("Index", new { page = ContentReference.StartPage }.page.ToPageReference());
+            else
+            {
+                ModelState.AddModelError("wrong_username","Wrong username or password");
+            }
+            
+            return View("Index",model);
         }
-
-        // ToDo: Lab incustomers module
-        public ActionResult CreateAccount(AccountPage currentPage, string userName, string passWord)
+        
+        public ActionResult CreateAccount(AccountPage currentPage, AccountViewModel model)
         {
+            // The important here are the Roles and the Contact properties 
+            string firstName = model.FirstName;
+            string lastName = model.LastName;
+            string emailAddress = model.UserName; // 
+            string password = model.Password;
 
-            return null; // for now
+            MembershipUser user = null;
+            
+            MembershipCreateStatus createStatus;
+            user = Membership.CreateUser(emailAddress, password, emailAddress,
+                                         null, null, true, out createStatus);
+            //CustomerContext.Current.
+            // Create the Contact in ECF 
+            CustomerContact customerContact = CustomerContact.CreateInstance(user);
+            customerContact.FirstName = firstName;
+            customerContact.LastName = lastName;
+            customerContact.RegistrationSource = String.Format("{0}, {1}"
+                , this.Request.Url.Host, SiteContext.Current);
+
+            customerContact.Email = emailAddress;
+
+            customerContact.SaveChanges();
+
+            
+            // We don't need this anymore for visitors/customers
+            Roles.AddUserToRole(user.UserName, AppRoles.EveryoneRole);
+            Roles.AddUserToRole(user.UserName, AppRoles.RegisteredRole);
+
+            if (Roles.RoleExists("ClubMember"))
+            {
+                Roles.AddUserToRole(user.UserName, "ClubMember");
+            }
+            // Call for further properties to be set
+            SetContactProperties(customerContact);
+
+            return Login(currentPage, model);            
         }
 
         protected void SetContactProperties(CustomerContact contact)
         {
-  
+            Organization org = Organization.CreateInstance();
+            org.Name = "ParentOrg";
+            org.SaveChanges();
+            
+            contact.CustomerGroup = "Partner";
+
+            // The custom field
+            contact["Geography"] = "West";
+            contact.OwnerId = org.PrimaryKeyId;
+
+            contact.SaveChanges();
         }
 
         public static void CreateAuthenticationCookie(HttpContextBase httpContext, string username, string domain, bool remember)

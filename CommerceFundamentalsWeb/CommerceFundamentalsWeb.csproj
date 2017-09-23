@@ -331,6 +331,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Properties\_PlaceHolder.txt" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Static\css\bootstrap-collapse.js" />
     <Content Include="Static\css\bootstrap-responsive.css" />
     <Content Include="Static\css\bootstrap.css" />
@@ -368,7 +376,6 @@
     <Content Include="modules\_protected\CMS\web.config" />
     <Content Include="modules\_protected\CMS\CMS.zip" />
     <None Include="packages.config" />
-    <Content Include="Views\Account\Index.cshtml" />
     <Content Include="Views\Cart\Index.cshtml" />
     <Content Include="Views\Cart\NoCart.cshtml" />
     <Content Include="Views\CheckOut\Index.cshtml" />
@@ -385,6 +392,8 @@
     <Content Include="Views\FashionNode\Index.cshtml" />
     <Content Include="Views\BlouseProduct\Index.cshtml" />
     <Content Include="Views\FashionNode\CreateDefaultEntry.cshtml" />
+    <Content Include="Views\Account\Index.cshtml" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
