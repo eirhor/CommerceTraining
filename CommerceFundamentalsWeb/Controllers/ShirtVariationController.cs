@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Catalog;
@@ -7,6 +8,7 @@ using CommerceFundamentalsWeb.Models.ViewModels;
 using EPiServer;
 using EPiServer.Commerce.Catalog;
 using EPiServer.Commerce.Catalog.ContentTypes;
+using EPiServer.Commerce.Marketing;
 using EPiServer.Commerce.Order;
 using EPiServer.Core;
 using EPiServer.Globalization;
@@ -21,6 +23,7 @@ namespace CommerceFundamentalsWeb.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderGroupFactory _orderGroupFactory;
         private readonly ILineItemValidator _lineItemValidator;
+        private readonly IPromotionEngine _promotionEngine;
 
         public ShirtVariationController(IContentLoader contentLoader, 
             UrlResolver urlResolver, 
@@ -28,11 +31,12 @@ namespace CommerceFundamentalsWeb.Controllers
             ThumbnailUrlResolver thumbnailUrlResolver, 
             IOrderRepository orderRepository,
             IOrderGroupFactory orderGroupFactory,
-            ILineItemValidator lineItemValidator) : base(contentLoader, urlResolver, assetUrlResolver, thumbnailUrlResolver)
+            ILineItemValidator lineItemValidator, IPromotionEngine promotionEngine) : base(contentLoader, urlResolver, assetUrlResolver, thumbnailUrlResolver)
         {
             _orderRepository = orderRepository;
             _orderGroupFactory = orderGroupFactory;
             _lineItemValidator = lineItemValidator;
+            _promotionEngine = promotionEngine;
         }
 
         public ActionResult Index(ShirtVariation currentContent)
@@ -44,6 +48,14 @@ namespace CommerceFundamentalsWeb.Controllers
             model.MainBody = currentContent.MainBody;
             model.Url = GetUrl(currentContent.ContentLink);
             model.PriceString = currentContent.GetDefaultPrice().UnitPrice.Amount.ToString("0.00");
+
+            List<RewardDescription> rewardDescriptions = _promotionEngine.Evaluate(currentContent.ContentLink).ToList();
+
+            if (rewardDescriptions.Any())
+            {
+                model.Messages = String.Join("<br/>",rewardDescriptions.Select(x=>x.Promotion.Name));
+                model.DiscountPrice = rewardDescriptions.First().SavedAmount;
+            }
 
             return View(model);
         }

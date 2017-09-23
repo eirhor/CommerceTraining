@@ -330,6 +330,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Models\Properties\_PlaceHolder.txt" />
+    <Content Include="Configs\Mediachase.Search.Filters.config" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

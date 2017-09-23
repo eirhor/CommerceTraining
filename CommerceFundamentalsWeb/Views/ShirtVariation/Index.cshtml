@@ -3,7 +3,10 @@
 <h1>@Model.Name</h1>
 <img src="@Model.Image"/>
 <div>
-    Price <strong>@Model.PriceString</strong>
+    Price <strong>@Model.PriceString</strong><br/><i>Discount: @Model.DiscountPrice.ToString("0.00")</i>
+    <div>
+        @Model.Messages
+    </div>
     @Html.CheckBoxFor(x => x.CanBeMonogrammed) <span>can be monogrammed</span>
 </div>
 

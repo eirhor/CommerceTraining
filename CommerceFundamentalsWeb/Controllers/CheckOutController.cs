@@ -142,7 +142,20 @@ namespace CommerceFundamentalsWeb.Controllers
                     throw new Exception("Not possible right now");
                 }
 
-                cart.ProcessPayments();
+                try
+                {
+                    cart.ProcessPayments();
+                }
+                catch (Exception e)
+                {
+                    foreach (
+                        var p in cart.GetFirstForm().Payments.Where(p => p.Status != PaymentStatus.Processed.ToString()))
+                    {
+                        cart
+                    }
+                    _orderRepository.Save(cart);
+                    throw new Exception("Payment failed");
+                }
 
                 var totalProcessedAmount = cart.GetFirstForm().Payments.Where
                     (x => x.Status.Equals(PaymentStatus.Processed.ToString())).Sum(x => x.Amount);

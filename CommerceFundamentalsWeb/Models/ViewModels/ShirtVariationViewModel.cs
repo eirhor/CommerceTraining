@@ -15,5 +15,9 @@ namespace CommerceFundamentalsWeb.Models.ViewModels
         public bool CanBeMonogrammed { get; set; }
         public XhtmlString MainBody { get; set; }
 
+        public string Messages { get; set; }
+
+        public decimal DiscountPrice { get; set; }
+
     }
 }

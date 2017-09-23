@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
@@ -8,6 +9,7 @@ using EPiServer.Commerce.Order;
 using EPiServer.Core;
 using EPiServer.Security;
 using EPiServer.Web.Mvc;
+using Mediachase.Commerce;
 using Mediachase.Commerce.Customers;
 using Mediachase.Commerce.Security;
 
@@ -67,9 +69,12 @@ namespace CommerceFundamentalsWeb.Controllers
                     warningMessages = "No Messages";
                 }
 
-                _promotionEngine.Run(cart);
+                var descriptions = _promotionEngine.Run(cart);
 
-                
+                Money totalDiscount = _orderGroupCalculator.GetOrderDiscountTotal(cart, cart.Currency);
+
+                model.PromotionMessage = string.Join("<br/>", descriptions.Select(x => x.Promotion.Name));
+                model.OrderDiscount = totalDiscount;
                 model.LineItems = cart.GetAllLineItems();
                 model.SubTotal = _orderGroupCalculator.GetSubTotal(cart);
                 model.WarningMessage = warningMessages;

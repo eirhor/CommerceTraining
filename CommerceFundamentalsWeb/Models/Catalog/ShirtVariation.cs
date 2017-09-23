@@ -25,8 +25,10 @@ namespace CommerceFundamentalsWeb.Models.Catalog
         public virtual XhtmlString MainBody { get; set; }
 
         [IncludeInDefaultSearch]
+        [Searchable]        
         public virtual string Size { get; set; }
         [IncludeInDefaultSearch]
+        [Searchable]
         public virtual string Color { get; set; }
         public virtual bool CanBeMonogrammed { get; set; }
         

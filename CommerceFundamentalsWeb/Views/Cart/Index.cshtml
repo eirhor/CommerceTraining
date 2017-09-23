@@ -1,5 +1,6 @@
 ﻿@using EPiServer.Core
 @using EPiServer.Web.Mvc.Html
+@using Mediachase.Commerce.Orders
 
 @model CommerceFundamentalsWeb.Models.ViewModels.CartViewModel
 
@@ -32,6 +33,12 @@
 
 <div>
     Cart total: @Model.SubTotal
+    @if (Model.OrderDiscount.Amount > 0)
+    {
+        <span>Cart Discount: </span>@Model.OrderDiscount.Amount.ToString("0.00");
+        <br/>
+        @Model.PromotionMessage
+    }
 </div>
 
 <div>

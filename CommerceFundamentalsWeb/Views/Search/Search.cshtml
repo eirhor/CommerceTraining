@@ -10,10 +10,10 @@
     <b>Type specific:</b>
 </div>
 
-@*<div>
+<div>
         FashionNodes:
         <ul>
-            @foreach (var item in Model.nodes)
+            @foreach (var item in Model.Nodes)
             {
                 <li>
                     @Html.ContentLink(item.ContentLink)
@@ -26,7 +26,7 @@
     <div>
         FashionProducts:
         <ul>
-            @foreach (var item in Model.products)
+            @foreach (var item in Model.Products)
             {
                 <li>
                     @Html.ContentLink(item.ContentLink)
@@ -39,7 +39,7 @@
     <div>
         FashionVariants:
         <ul>
-            @foreach (var item in Model.variants)
+            @foreach (var item in Model.Variants)
             {
                 <li>
                     @Html.ContentLink(item.ContentLink)
@@ -51,7 +51,7 @@
             <b>Generic (IContent)</b>
         </div>
         <ul>
-            @foreach (var item in Model.allContent)
+            @foreach (var item in Model.AllContent)
             {
                 <li>
                     @Html.ContentLink(item.ContentLink)
@@ -64,7 +64,7 @@
     </div>
     <div>
         <ul>
-            @foreach (var item in Model.facets)
+            @foreach (var item in Model.Facets)
             {
                 <li>
                     @item
@@ -73,4 +73,4 @@
         </ul>
     </div>
 
-    </div>*@
+    </div>
