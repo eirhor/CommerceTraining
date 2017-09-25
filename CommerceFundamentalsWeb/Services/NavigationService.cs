@@ -31,11 +31,12 @@ namespace CommerceFundamentalsWeb.Services
         public NavigationViewModel GetNavigation()
         {
             var childPages = _contentRepository.GetChildren<INavigationItem>(_startPage.ContentLink);
+            var commercePages = _contentRepository.GetChildren<IContent>(_startPage.Settings.topCategory);
 
             return new NavigationViewModel
             {
                 CmsItems = childPages,
-                CommerceItems = new List<IContent>()
+                CommerceItems = commercePages
             };
         }
     }
