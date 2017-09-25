@@ -283,6 +283,10 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CartController.cs" />
+    <Compile Include="Controllers\Catalog\CatalogControllerBase.cs" />
+    <Compile Include="Controllers\Catalog\ShirtVariationController.cs" />
+    <Compile Include="Controllers\Catalog\ShirtProductController.cs" />
+    <Compile Include="Controllers\Catalog\FashionNodeController.cs" />
     <Compile Include="Controllers\CheckOutController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -322,7 +326,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Business\" />
-    <Folder Include="Views\PageControllerBase\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\Catalog\_PlaceHolder.txt" />
@@ -376,6 +379,9 @@
     <Content Include="Views\Shared\Navigation.cshtml" />
     <Content Include="Views\StartPage\Index.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\FashionNode\Index.cshtml" />
+    <Content Include="Views\ShirtProduct\Index.cshtml" />
+    <Content Include="Views\ShirtVariation\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
