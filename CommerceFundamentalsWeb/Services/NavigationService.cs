@@ -7,6 +7,7 @@ using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
 using EPiServer;
 using EPiServer.Core;
+using EPiServer.Filters;
 using EPiServer.ServiceLocation;
 
 namespace CommerceFundamentalsWeb.Services
@@ -31,7 +32,7 @@ namespace CommerceFundamentalsWeb.Services
         public NavigationViewModel GetNavigation()
         {
             var childPages = _contentRepository.GetChildren<INavigationItem>(_startPage.ContentLink);
-            var commercePages = _contentRepository.GetChildren<IContent>(_startPage.Settings.topCategory);
+            var commercePages = FilterForVisitor.Filter(_contentRepository.GetChildren<IContent>(_startPage.Settings.topCategory));
 
             return new NavigationViewModel
             {

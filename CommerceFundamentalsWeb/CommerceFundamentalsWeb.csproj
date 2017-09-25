@@ -285,8 +285,8 @@
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\Catalog\CatalogControllerBase.cs" />
     <Compile Include="Controllers\Catalog\ShirtVariationController.cs" />
-    <Compile Include="Controllers\Catalog\ShirtProductController.cs" />
     <Compile Include="Controllers\Catalog\FashionNodeController.cs" />
+    <Compile Include="Controllers\Catalog\ShirtProductController.cs" />
     <Compile Include="Controllers\CheckOutController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
