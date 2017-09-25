@@ -1,21 +1,23 @@
 ﻿@using EPiServer.Core
 
-@{
-    // Get a reference to the IContentRepository
-    var cr = EPiServer.ServiceLocation.ServiceLocator.Current.GetInstance<EPiServer.IContentRepository>();
-    // Get the child pages of the start page.
-    var childPages = cr.GetChildren<PageData>(ContentReference.StartPage);
-}
+@model CommerceFundamentalsWeb.Models.ViewModels.NavigationViewModel
 
-<b>@Html.PageLink(ContentReference.StartPage)</b>
-@foreach (var page in childPages)
+<b>@Html.ContentLink(ContentReference.StartPage)</b>
+@foreach (var page in Model.CmsItems)
 {
-    if (page.VisibleInMenu == true)
+    if (page.VisibleInMenu)
     {
         <b>
             -:-
-            @Html.PageLink(page)
+            @Html.ContentLink(page)
         </b>
     }
+}
 
+@foreach (var commercePage in Model.CommerceItems)
+{
+    <b>
+        -:-
+        @Html.ContentLink(commercePage)
+    </b>
 }

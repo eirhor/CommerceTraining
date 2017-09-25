@@ -1,9 +1,14 @@
-﻿@using EPiServer.Framework.Web.Mvc.Html
+﻿@using CommerceFundamentalsWeb.Models.ViewModels
+@using CommerceFundamentalsWeb.Services
+@using EPiServer.Framework.Web.Mvc.Html
 @using EPiServer.Core
+@using EPiServer.ServiceLocation
 @*@using AlloyTraining.Models.Pages;
 @using AlloyTraining.Models.ViewModels;*@
 
-@*@model IPageViewModel<SitePageData>*@
+@{
+    var navigationService = ServiceLocator.Current.GetInstance<INavigationService>();
+}
 
 <!DOCTYPE html>
 
@@ -32,7 +37,7 @@
                     <img src="~/Static/gfx/epi_edu.png" />
                 </div>
                 <div class="span10">
-                    @{Html.RenderPartial("Navigation");}
+                    @{Html.RenderPartial("Navigation", navigationService.GetNavigation());}
                 </div>
             </div>
         </div>

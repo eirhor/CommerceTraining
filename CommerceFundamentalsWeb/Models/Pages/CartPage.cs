@@ -7,7 +7,7 @@ namespace CommerceFundamentalsWeb.Models.Pages
 {
     [ContentType(DisplayName = "CartPage", GUID = "5ccd975b-7af5-4231-aee7-d4ecdea51245"
         , Description = "Showing the cart")]
-    public class CartPage : PageData
+    public class CartPage : PageData, INavigationItem
     {
         [CultureSpecific]
         [Display(

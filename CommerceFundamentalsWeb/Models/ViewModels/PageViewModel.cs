@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using EPiServer.Commerce.Catalog.ContentTypes;
+﻿
+using System;
+using CommerceFundamentalsWeb.Services;
 using EPiServer.Core;
+using EPiServer.ServiceLocation;
 
 namespace CommerceFundamentalsWeb.Models.ViewModels
 {
@@ -8,15 +10,14 @@ namespace CommerceFundamentalsWeb.Models.ViewModels
     {
 
         // ToDo: rootChildren nodes (lab C)
-
-
-        public IEnumerable<CatalogContentBase> topLevelCategories { get; set; }
-        public IEnumerable<IContent> myPageChildren { get; set; }
-        public virtual XhtmlString MainBodyStartPage { get; set; }
+        private readonly INavigationService _navigationService;
 
         public PageViewModel(T currentPage)
         {
+            _navigationService = ServiceLocator.Current.GetInstance<INavigationService>();
+
             CurrentPage = currentPage;
+            Navigation = _navigationService.GetNavigation();
         }
 
         public T CurrentPage
@@ -24,5 +25,7 @@ namespace CommerceFundamentalsWeb.Models.ViewModels
             get;
             set;
         }
+
+        public NavigationViewModel Navigation { get; }
     }
 }

@@ -36,14 +36,7 @@ namespace CommerceFundamentalsWeb.Controllers
 
         public ActionResult Index(StartPage currentPage)
         {
-            var model = new PageViewModel<StartPage>(currentPage)
-            {
-                MainBodyStartPage = currentPage.MainBody,
-                myPageChildren = _contentLoader.GetChildren<IContent>(currentPage.ContentLink),
-                
-                // uncomment the below when the catalog is modelled
-                //topLevelCategories = _contentLoader.GetChildren<CatalogContentBase>(topCategory).OfType<NodeContent>(),
-            };
+            var model = new PageViewModel<StartPage>(currentPage);
 
             return View(model);
         }
