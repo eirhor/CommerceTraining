@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Catalog;
 using CommerceFundamentalsWeb.Models.ViewModels;
+using CommerceFundamentalsWeb.Services;
 using EPiServer;
 using EPiServer.Commerce.Catalog;
 using EPiServer.Commerce.Catalog.ContentTypes;
@@ -14,12 +15,10 @@ namespace CommerceFundamentalsWeb.Controllers.Catalog
 {
     public class ShirtVariationController : CatalogControllerBase<ShirtVariation>
     {
-        public ShirtVariationController(IContentLoader contentLoader, IUrlResolver urlResolver, AssetUrlResolver assetUrlResolver, ThumbnailUrlResolver thumbnailUrlResolver) :
-            base(contentLoader, urlResolver, assetUrlResolver, thumbnailUrlResolver)
+        public ShirtVariationController(ICommerceService commerceService) : base(commerceService)
         {
         }
 
-        // GET: FashionNode
         public ActionResult Index(ShirtVariation currentContent)
         {
             var model = new ShirtVariationViewModel

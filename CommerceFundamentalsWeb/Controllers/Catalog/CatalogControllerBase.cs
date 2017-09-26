@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
+using CommerceFundamentalsWeb.Services;
 using CommerceFundamentalsWeb.SupportingClasses;
 using EPiServer;
 using EPiServer.Commerce.Catalog;
@@ -19,58 +20,36 @@ namespace CommerceFundamentalsWeb.Controllers.Catalog
     [SessionState(SessionStateBehavior.Disabled)]
     public class CatalogControllerBase<T> : ContentController<T> where T : CatalogContentBase
     {
-        private readonly IContentLoader _contentLoader;
-        private readonly IUrlResolver _urlResolver;
-        private readonly AssetUrlResolver _assetUrlResolver;
-        private readonly ThumbnailUrlResolver _thumbnailUrlResolver;
+        private readonly ICommerceService _commerceService;
 
-        public CatalogControllerBase(IContentLoader contentLoader, IUrlResolver urlResolver, AssetUrlResolver assetUrlResolver, ThumbnailUrlResolver thumbnailUrlResolver)
+        public CatalogControllerBase(ICommerceService commerceService)
         {
-            _contentLoader = contentLoader;
-            _urlResolver = urlResolver;
-            _assetUrlResolver = assetUrlResolver;
-            _thumbnailUrlResolver = thumbnailUrlResolver;
+            _commerceService = commerceService;
         }
 
         public string GetDefaultAsset(IAssetContainer container)
         {
-            return _assetUrlResolver.GetAssetUrl(container);
+            return _commerceService.GetDefaultAsset(container);
         }
 
         public string GetNamedAsset(IAssetContainer container, string groups)
         {
-            return _thumbnailUrlResolver.GetThumbnailUrl(container, groups);
+            return _commerceService.GetNamedAsset(container, groups);
         }
 
         public string GetUrl(ContentReference contentLink)
         {
-            return _urlResolver.GetUrl(contentLink);
+            return _commerceService.GetUrl(contentLink);
         }
 
         public IEnumerable<NameAndUrls> GetNodes(ContentReference contentLink)
         {
-            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<NodeContent>(contentLink)).Cast<NodeContent>();
-
-            return pages.Select(p => new NameAndUrls
-            {
-                name = p.Name,
-                url = GetUrl(p.ContentLink),
-                imageUrl = GetDefaultAsset(p),
-                imageThumbUrl = GetNamedAsset(p, "Thumbnail")
-            });
+            return _commerceService.GetNodes(contentLink);
         }
 
         public IEnumerable<NameAndUrls> GetEntries(ContentReference contentLink)
         {
-            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<EntryContentBase>(contentLink)).Cast<EntryContentBase>();
-
-            return pages.Select(p => new NameAndUrls
-            {
-                name = p.Name,
-                url = GetUrl(p.ContentLink),
-                imageUrl = GetDefaultAsset(p),
-                imageThumbUrl = GetNamedAsset(p, "Thumbnail")
-            });
+            return _commerceService.GetEntries(contentLink);
         }
     }
 }
