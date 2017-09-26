@@ -1,13 +1,23 @@
 ﻿@model CommerceFundamentalsWeb.SupportingClasses.NodeEntryCombo
 
 <div>
-    Nodes
+    <h3>Nodes</h3>
     <ul>
         @foreach (var node in Model.nodes)
         {
             <li>
                 <a href="@node.url">@node.name</a>
                 <img src="@node.imageThumbUrl" alt="@node.name" />
+            </li>
+        }
+    </ul>
+    <h3>Entries</h3>
+    <ul>
+        @foreach (var entry in Model.entries)
+        {
+            <li>
+                <a href="@entry.url">@entry.name</a>
+                <img src="@entry.imageThumbUrl" alt="@entry.name" />
             </li>
         }
     </ul>

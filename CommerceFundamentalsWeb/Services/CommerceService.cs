@@ -18,14 +18,14 @@ namespace CommerceFundamentalsWeb.Services
     public class CommerceService : ICommerceService
     {
         private readonly IContentLoader _contentLoader;
-        private readonly IUrlResolver _urlResolver;
+        private readonly UrlResolver _urlResolver;
         private readonly AssetUrlResolver _assetUrlResolver;
         private readonly ThumbnailUrlResolver _thumbnailUrlResolver;
         private readonly IMarketService _marketService;
 
         public CommerceService(
             IContentLoader contentLoader, 
-            IUrlResolver urlResolver, 
+            UrlResolver urlResolver, 
             AssetUrlResolver assetUrlResolver, 
             ThumbnailUrlResolver thumbnailUrlResolver,
             IMarketService marketService)
@@ -49,7 +49,8 @@ namespace CommerceFundamentalsWeb.Services
 
         public string GetUrl(ContentReference contentLink)
         {
-            return _urlResolver.GetUrl(contentLink);
+            var test = _urlResolver.GetUrl(contentLink);
+            return test;
         }
 
         public IEnumerable<NameAndUrls> GetNodes(ContentReference contentLink)
