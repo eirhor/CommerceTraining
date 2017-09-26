@@ -56,7 +56,7 @@ namespace CommerceFundamentalsWeb.Controllers
 
             if (cart == null)
             {
-                return View("NoCart");
+                return RedirectToAction("NoCart");
             }
 
             var warningMessages = ValidateCart(cart);
@@ -78,6 +78,11 @@ namespace CommerceFundamentalsWeb.Controllers
             _orderRepository.Save(cart);
 
             return View("Index", model);
+        }
+
+        public ActionResult NoCart()
+        {
+            return View("NoCart");
         }
 
         public ActionResult Checkout()

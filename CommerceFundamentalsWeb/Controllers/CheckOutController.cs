@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
@@ -8,8 +10,12 @@ using EPiServer.Commerce.Order;
 using EPiServer.Core;
 using EPiServer.Security;
 using EPiServer.Web.Mvc;
+using Mediachase.BusinessFoundation.Data.Business;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Customers;
+using Mediachase.Commerce.Orders;
+using Mediachase.Commerce.Orders.Dto;
+using Mediachase.Commerce.Orders.Managers;
 using Mediachase.Commerce.Security;
 // for the extension-method
 
@@ -60,33 +66,56 @@ namespace CommerceFundamentalsWeb.Controllers
         // ToDo: in the first exercise (E1) Ship & Pay
         public ActionResult Index(CheckOutPage currentPage)
         {
-            // Try to load the cart  
+            var customerId = PrincipalInfo.CurrentPrincipal.GetContactId();
+            var cart = _orderRepository.LoadCart<ICart>(customerId, "Default");
+
+            if (cart == null)
+            {
+                return RedirectToAction("NoCart", "Cart");
+            }
 
             var model = new CheckOutViewModel(currentPage)
             {
                 // ToDo: Exercise (E1) - get shipments & payments
-
+                ShippingRates = GetShippingRates(),
+                ShipmentMethods = GetShipmentMethods(),
+                PaymentMethods = GetPaymentMethods()
             };
 
             return View(model);
         }
 
-
-        // Exercise (E1) creation of GetPaymentMethods(), GetShipmentMethods() and GetShippingRates() goes below
-        // ToDo: Get IEnumerables of Shipping and Payment methods along with ShippingRates
-
-
-
-
-
         //Exercise (E2) Do CheckOut
         public ActionResult CheckOut(CheckOutViewModel model)
         {
-            // ToDo: Load the cart
+            var customerId = PrincipalInfo.CurrentPrincipal.GetContactId();
+            var cart = _orderRepository.LoadCart<ICart>(customerId, "Default");
 
+            if (cart == null)
+            {
+                return RedirectToAction("NoCart", "Cart");
+            }
 
             // ToDo: Add an OrderAddress
-
+            CustomerAddress customerAddress;
+            if (CustomerContext.Current.CurrentContact == null)
+            {
+                customerAddress = CustomerAddress.CreateInstance();
+                customerAddress.AddressType = CustomerAddressTypeEnum.Shipping;
+                customerAddress.Name = "Default";
+                customerAddress.FirstName = "Eirik";
+                customerAddress.LastName = "Horvath";
+                customerAddress.CountryCode = "47";
+                customerAddress.CountryName = "Norway";
+                customerAddress.RegionName = "Buskerud";
+                customerAddress.RegionCode = "0123";
+                customerAddress.DaytimePhoneNumber = "90048775";
+                customerAddress.Email = "eirik@geta.no";
+            }
+            else
+            {
+                
+            }
 
             // ToDo: Define/update Shipping
 
@@ -110,6 +139,28 @@ namespace CommerceFundamentalsWeb.Controllers
             return RedirectToAction("Index", new { node = orderPageReference, passedAlong = passingValue });
         }
 
+        private OrderAddress GetMockAddress()
+        {
+            return new OrderAddress
+            {
+                City = "Hokksund",
+                CountryCode = "47",
+                CountryName = "Norway",
+                Created = DateTime.Now,
+                DaytimePhoneNumber = "90048775",
+                CreatorId = PrincipalInfo.CurrentPrincipal.GetContactId().ToString(),
+                Email = "eirik@geta.no",
+                EveningPhoneNumber = "90048775",
+                PostalCode = "3300",
+                State = "Buskerud",
+                Line1 = "Pålsplass 3B",
+                Name = "Home",
+                RegionCode = "0123",
+                RegionName = "wat",
+                FirstName = "Eirik",
+                LastName = "Horvath"
+            };
+        }
 
         // Prewritten 
         private string ValidateCart(ICart cart)
@@ -134,7 +185,9 @@ namespace CommerceFundamentalsWeb.Controllers
         }
 
         private void AdjustFirstShipmentInOrder(ICart cart, IOrderAddress orderAddress, Guid selectedShip)
-        { }
+        {
+            
+        }
 
         private void AddPaymentToOrder(ICart cart, Guid selectedPaymentGuid)
         { }
@@ -145,7 +198,11 @@ namespace CommerceFundamentalsWeb.Controllers
 
             if (CustomerContext.Current.CurrentContact == null)
             {
-                
+                var firstShipment = cart.GetFirstShipment();
+
+                firstShipment.ShippingAddress = GetMockAddress();
+
+                cart.AddShipment(firstShipment);
             }
             else
             {
@@ -163,6 +220,29 @@ namespace CommerceFundamentalsWeb.Controllers
         private static Guid GetContactId()
         {
             return PrincipalInfo.CurrentPrincipal.GetContactId();
+        }
+
+        private IEnumerable<PaymentMethodDto.PaymentMethodRow> GetPaymentMethods()
+        {
+            var currentMarket = _currentMarket.GetCurrentMarket();
+            var paymentMethods = PaymentManager.GetPaymentMethodsByMarket(currentMarket.MarketName);
+            return paymentMethods.PaymentMethod;
+        }
+
+        private IEnumerable<ShippingMethodDto.ShippingMethodRow> GetShipmentMethods()
+        {
+            var currentMarket = _currentMarket.GetCurrentMarket();
+            var shipmentMethods = ShippingManager.GetShippingMethodsByMarket(currentMarket.MarketName, false);
+            return shipmentMethods.ShippingMethod;
+        }
+
+        private IEnumerable<ShippingRate> GetShippingRates()
+        {
+            var shipmentMethods = GetShipmentMethods();
+            return shipmentMethods.Select(s => new ShippingRate(
+                s.ShippingMethodId, 
+                s.Name, 
+                new Money(s.BasePrice, s.Currency)));
         }
     }
 }

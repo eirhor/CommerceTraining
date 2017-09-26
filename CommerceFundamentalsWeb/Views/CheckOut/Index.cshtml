@@ -5,7 +5,15 @@
 
 <div>
     Shipping rates
-
+    <ul>
+        @foreach (var rate in Model.ShippingRates)
+        {
+            <li>
+                <h6>@rate.Name:</h6>
+                <p>@rate.Money.ToString()</p>
+            </li>
+        }
+    </ul>
 
 </div>
 
@@ -14,8 +22,8 @@
     Make your choices
     @using (@Html.BeginForm("CheckOut", "Checkout", FormMethod.Post))
     {
-        @*@Html.DropDownListFor(m => m.SelectedShipId, new SelectList(Model.ShipmentMethods, "ShippingMethodId", "DisplayName"))
-            @Html.DropDownListFor(m => m.SelectedPayId, new SelectList(Model.PaymentMethods, "PaymentMethodId", "Name"))*@
+        @Html.DropDownListFor(m => m.SelectedShipId, new SelectList(Model.ShipmentMethods, "ShippingMethodId", "DisplayName"))
+        @Html.DropDownListFor(m => m.SelectedPayId, new SelectList(Model.PaymentMethods, "PaymentMethodId", "Name"))
 
         <button type="submit">Check out</button>
     }
