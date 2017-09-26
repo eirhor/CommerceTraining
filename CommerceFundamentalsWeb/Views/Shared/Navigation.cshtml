@@ -2,6 +2,7 @@
 
 @model CommerceFundamentalsWeb.Models.ViewModels.NavigationViewModel
 
+<h4>Cms</h4>
 <b>@Html.ContentLink(ContentReference.StartPage)</b>
 @foreach (var page in Model.CmsItems)
 {
@@ -14,10 +15,16 @@
     }
 }
 
-@foreach (var commercePage in Model.CommerceItems)
+<br />
+<h4>Commerce</h4>
+@foreach (var item in Model.CommerceItems.Select((value, index) => new { value, index }))
 {
     <b>
-        -:-
-        @Html.ContentLink(commercePage)
+        @if (item.index != 0)
+        {
+            <span>-:-</span>
+        }
+
+        @Html.ContentLink(item.value)
     </b>
 }

@@ -313,7 +313,9 @@
     <Compile Include="Models\Pages\SitePageBase.cs" />
     <Compile Include="Models\Pages\StartPage.cs" />
     <Compile Include="Models\ViewModels\AccountViewModel.cs" />
+    <Compile Include="Models\ViewModels\BlouseProductViewModel.cs" />
     <Compile Include="Models\ViewModels\CartViewModel.cs" />
+    <Compile Include="Models\ViewModels\CatalogViewModel.cs" />
     <Compile Include="Models\ViewModels\CheckOutViewModel.cs" />
     <Compile Include="Models\ViewModels\NavigationViewModel.cs" />
     <Compile Include="Models\ViewModels\OrderViewModel.cs" />
@@ -386,6 +388,7 @@
     <Content Include="Views\FashionNode\Index.cshtml" />
     <Content Include="Views\ShirtProduct\Index.cshtml" />
     <Content Include="Views\ShirtVariation\Index.cshtml" />
+    <Content Include="Views\BlouseProduct\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

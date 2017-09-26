@@ -49,13 +49,12 @@ namespace CommerceFundamentalsWeb.Services
 
         public string GetUrl(ContentReference contentLink)
         {
-            var test = _urlResolver.GetUrl(contentLink);
-            return test;
+            return _urlResolver.GetUrl(contentLink);
         }
 
         public IEnumerable<NameAndUrls> GetNodes(ContentReference contentLink)
         {
-            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<NodeContent>(contentLink)).Cast<NodeContent>();
+            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<NodeContent>(contentLink)).OfType<NodeContent>();
 
             return pages.Select(p => new NameAndUrls
             {
@@ -68,7 +67,7 @@ namespace CommerceFundamentalsWeb.Services
 
         public IEnumerable<NameAndUrls> GetEntries(ContentReference contentLink)
         {
-            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<EntryContentBase>(contentLink)).Cast<EntryContentBase>();
+            var pages = FilterForVisitor.Filter(_contentLoader.GetChildren<EntryContentBase>(contentLink)).OfType<EntryContentBase>();
 
             return pages.Select(p => new NameAndUrls
             {
@@ -79,6 +78,11 @@ namespace CommerceFundamentalsWeb.Services
             });
         }
 
+        public IEnumerable<EntryContentBase> GetVariants(ProductContent product)
+        {
+            var variantLinks = product.GetVariants();
 
+            return variantLinks.Select(v => _contentLoader.Get<EntryContentBase>(v));
+        }
     }
 }

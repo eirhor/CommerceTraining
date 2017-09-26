@@ -18,7 +18,8 @@ using EPiServer.Web.Routing;
 namespace CommerceFundamentalsWeb.Controllers.Catalog
 {
     [SessionState(SessionStateBehavior.Disabled)]
-    public class CatalogControllerBase<T> : ContentController<T> where T : CatalogContentBase
+    public class CatalogControllerBase<T> : ContentController<T>
+        where T : CatalogContentBase
     {
         private readonly ICommerceService _commerceService;
 
@@ -50,6 +51,11 @@ namespace CommerceFundamentalsWeb.Controllers.Catalog
         public IEnumerable<NameAndUrls> GetEntries(ContentReference contentLink)
         {
             return _commerceService.GetEntries(contentLink);
+        }
+
+        public IEnumerable<EntryContentBase> GetVariants(ProductContent product)
+        {
+            return _commerceService.GetVariants(product);
         }
     }
 }

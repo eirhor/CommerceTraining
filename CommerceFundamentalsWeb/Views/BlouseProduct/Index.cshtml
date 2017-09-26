@@ -1,0 +1,15 @@
+﻿@model CommerceFundamentalsWeb.Models.ViewModels.BlouseProductViewModel
+
+<div>
+    <p>@Html.PropertyFor(m => m.CurrentContent.Code)</p>
+    <h3>@Html.PropertyFor(m => m.CurrentPage.Name)</h3>
+    <p>Variant codes</p>
+    <ul>
+        @foreach (var variant in Model.Variations)
+        {
+            <li>@variant.Code</li>
+        }
+    </ul>
+
+    @Html.ContentLink(Model.CampaignLink)
+</div>

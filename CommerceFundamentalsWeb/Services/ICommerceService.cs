@@ -16,5 +16,6 @@ namespace CommerceFundamentalsWeb.Services
         string GetUrl(ContentReference contentLink);
         IEnumerable<NameAndUrls> GetNodes(ContentReference contentLink);
         IEnumerable<NameAndUrls> GetEntries(ContentReference contentLink);
+        IEnumerable<EntryContentBase> GetVariants(ProductContent product);
     }
 }
