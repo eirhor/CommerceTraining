@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Catalog;
+using CommerceFundamentalsWeb.SupportingClasses;
 using EPiServer;
 using EPiServer.Commerce.Catalog;
 using EPiServer.Web.Routing;
@@ -20,7 +21,13 @@ namespace CommerceFundamentalsWeb.Controllers.Catalog
         // GET: FashionNode
         public ActionResult Index(FashionNode currentContent)
         {
-            return View(currentContent);
+            var nodeEntryCombo = new NodeEntryCombo
+            {
+                entries = GetEntries(currentContent.ContentLink),
+                nodes = GetNodes(currentContent.ContentLink)
+            };
+
+            return View(nodeEntryCombo);
         }
     }
 }

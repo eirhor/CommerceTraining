@@ -1,6 +1,17 @@
-﻿@model CommerceFundamentalsWeb.Models.Catalog.ShirtProduct
+﻿@using EPiServer.Commerce.Catalog.ContentTypes
+
+@model CommerceFundamentalsWeb.Models.Catalog.ShirtProduct
+
+@{
+    var variants = Model.GetVariants();
+}
 
 <div>
-    @Html.PropertyFor(m => m.Code)
-    @Html.PropertyFor(m => m.ContentType)
+    @Html.PropertyFor(m => m.MainBody)
+    <ul>
+        @foreach (var variant in variants)
+        {
+            <li>@Html.ContentLink(variant)</li>
+        }
+    </ul>
 </div>

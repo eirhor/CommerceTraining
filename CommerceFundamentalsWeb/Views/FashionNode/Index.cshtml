@@ -1,6 +1,14 @@
-﻿@model CommerceFundamentalsWeb.Models.Catalog.FashionNode
+﻿@model CommerceFundamentalsWeb.SupportingClasses.NodeEntryCombo
 
 <div>
-    @Html.PropertyFor(m => m.Code)
-    @Html.PropertyFor(m => m.ContentType)
+    Nodes
+    <ul>
+        @foreach (var node in Model.nodes)
+        {
+            <li>
+                <a href="@node.url">@node.name</a>
+                <img src="@node.imageThumbUrl" alt="@node.name" />
+            </li>
+        }
+    </ul>
 </div>
