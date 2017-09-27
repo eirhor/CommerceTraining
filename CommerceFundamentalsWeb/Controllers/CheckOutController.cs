@@ -10,6 +10,7 @@ using EPiServer.Commerce.Order;
 using EPiServer.Core;
 using EPiServer.Security;
 using EPiServer.Web.Mvc;
+using Mediachase.BusinessFoundation.Data;
 using Mediachase.BusinessFoundation.Data.Business;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Customers;
@@ -17,6 +18,8 @@ using Mediachase.Commerce.Orders;
 using Mediachase.Commerce.Orders.Dto;
 using Mediachase.Commerce.Orders.Managers;
 using Mediachase.Commerce.Security;
+using TransactionScope = Mediachase.Data.Provider.TransactionScope;
+
 // for the extension-method
 
 namespace CommerceFundamentalsWeb.Controllers
@@ -88,8 +91,7 @@ namespace CommerceFundamentalsWeb.Controllers
         //Exercise (E2) Do CheckOut
         public ActionResult CheckOut(CheckOutViewModel model)
         {
-            var customerId = PrincipalInfo.CurrentPrincipal.GetContactId();
-            var cart = _orderRepository.LoadCart<ICart>(customerId, "Default");
+            var cart = _orderRepository.LoadCart<ICart>(GetContactId(), "Default");
 
             if (cart == null)
             {
@@ -97,34 +99,27 @@ namespace CommerceFundamentalsWeb.Controllers
             }
 
             // ToDo: Add an OrderAddress
-            CustomerAddress customerAddress;
-            if (CustomerContext.Current.CurrentContact == null)
+            var isAuthenticated = PrincipalInfo.CurrentPrincipal.Identity.IsAuthenticated;
+
+            var orderAddress = AddAddressToOrder(cart);
+
+            AdjustFirstShipmentInOrder(cart, orderAddress, model.SelectedShipId);
+
+            AddPaymentToOrder(cart, model.SelectedPayId);
+
+            _orderRepository.Save(cart);
+
+            IPurchaseOrder purchaseOrder;
+            OrderReference orderReference;
+            using (var scope = new TransactionScope())
             {
-                customerAddress = CustomerAddress.CreateInstance();
-                customerAddress.AddressType = CustomerAddressTypeEnum.Shipping;
-                customerAddress.Name = "Default";
-                customerAddress.FirstName = "Eirik";
-                customerAddress.LastName = "Horvath";
-                customerAddress.CountryCode = "47";
-                customerAddress.CountryName = "Norway";
-                customerAddress.RegionName = "Buskerud";
-                customerAddress.RegionCode = "0123";
-                customerAddress.DaytimePhoneNumber = "90048775";
-                customerAddress.Email = "eirik@geta.no";
+                _inventoryProcessor.AdjustInventoryOrRemoveLineItem(
+                    cart.GetFirstShipment(),
+                    OrderStatus.InProgress,
+                    (item, issue) => {});
+
+                cart.ProcessPayments();
             }
-            else
-            {
-                
-            }
-
-            // ToDo: Define/update Shipping
-
-
-            // ToDo: Add a Payment to the Order 
-
-
-            // ToDo: Add a transaction scope and convert the cart to PO
-
 
             // ToDo: Housekeeping (Statuses for Shipping and PO, OrderNotes and save the order)
 
@@ -186,11 +181,29 @@ namespace CommerceFundamentalsWeb.Controllers
 
         private void AdjustFirstShipmentInOrder(ICart cart, IOrderAddress orderAddress, Guid selectedShip)
         {
-            
+            var shipmentMethod = ShippingManager.GetShippingMethod(selectedShip).ShippingMethod.First();
+            var shipping = cart.GetFirstShipment();
+
+            shipping.ShippingMethodId = shipmentMethod.ShippingMethodId;
+            shipping.ShippingAddress = orderAddress;
+
+            var random = new Random();
+            shipping.ShipmentTrackingNumber = $"Shipment_{random.Next(1, 99999)}";
         }
 
         private void AddPaymentToOrder(ICart cart, Guid selectedPaymentGuid)
-        { }
+        {
+            var paymentMethod = PaymentManager.GetPaymentMethod(selectedPaymentGuid).PaymentMethod.First();
+            var payment = _orderGroupFactory.CreatePayment(cart);
+
+            payment.PaymentMethodId = paymentMethod.PaymentMethodId;
+            payment.PaymentType = PaymentType.Other;
+            payment.PaymentMethodName = paymentMethod.Name;
+
+            payment.Amount = _orderGroupCalculator.GetTotal(cart).Amount;
+
+            cart.AddPayment(payment);
+        }
 
         private IOrderAddress AddAddressToOrder(ICart cart)
         {
@@ -200,13 +213,39 @@ namespace CommerceFundamentalsWeb.Controllers
             {
                 var firstShipment = cart.GetFirstShipment();
 
-                firstShipment.ShippingAddress = GetMockAddress();
+                if (firstShipment.ShippingAddress != null)
+                {
+                    return firstShipment.ShippingAddress;
+                }
 
-                cart.AddShipment(firstShipment);
+                shippingAddress = firstShipment.ShippingAddress = GetMockAddress();
             }
             else
             {
+                if (CustomerContext.Current.CurrentContact.PreferredShippingAddress == null)
+                {
+                    var customerAddress = CustomerAddress.CreateInstance();
+                    customerAddress.AddressType = CustomerAddressTypeEnum.Shipping;
+                    customerAddress.Name = "Default";
+                    customerAddress.FirstName = "Eirik";
+                    customerAddress.LastName = "Horvath";
+                    customerAddress.CountryCode = "47";
+                    customerAddress.CountryName = "Norway";
+                    customerAddress.RegionName = "Buskerud";
+                    customerAddress.RegionCode = "0123";
+                    customerAddress.DaytimePhoneNumber = "90048775";
+                    customerAddress.Email = "eirik@geta.no";
 
+                    CustomerContext.Current.CurrentContact.AddContactAddress(customerAddress);
+                    CustomerContext.Current.CurrentContact.SaveChanges();
+
+                    CustomerContext.Current.CurrentContact.PreferredShippingAddress = customerAddress;
+                    CustomerContext.Current.CurrentContact.SaveChanges();
+
+                    return new OrderAddress(customerAddress);
+                }
+                
+                shippingAddress = new OrderAddress(CustomerContext.Current.CurrentContact.PreferredShippingAddress);
             }
 
             return shippingAddress;
