@@ -314,6 +314,7 @@
     <Content Include="Apps\Shell\Styles\ToolBar.skin" />
     <Content Include="Apps\Web.config" />
     <Content Include="EPiServerLog.config" />
+    <Content Include="Configs\Mediachase.Search.Filters.config" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

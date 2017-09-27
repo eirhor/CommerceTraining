@@ -48,11 +48,9 @@ namespace CommerceFundamentalsWeb.Controllers
             searchCriteria.RecordsToRetrieve = 25;
             searchCriteria.Locale = "en";
 
-            var hitCount = 0;
-
             var searchResult = filterHelper.SearchEntries(searchCriteria);
             var keyFieldPks = searchResult.GetKeyFieldValues<int>();
-            var searchReferences = keyFieldPks.Select(i => _referenceConverter.GetContentLink(i, CatalogContentType.CatalogEntry, 0));
+            var searchReferences = keyFieldPks.Select(i => _referenceConverter.GetEntryContentLink(i));
             localContent = _contentLoader.GetItems(searchReferences, new LoaderOptions());
 
             var facetGroupsCount = searchResult.FacetGroups.Count();
@@ -71,7 +69,6 @@ namespace CommerceFundamentalsWeb.Controllers
                 searchResultViewModel.allContent = localContent;
                 searchResultViewModel.facets = facetList;
             }
-
 
             return View(searchResultViewModel);
         }
