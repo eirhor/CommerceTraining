@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
+using CommerceFundamentalsWeb.Models.Catalog;
 using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
 using EPiServer;
@@ -7,6 +9,9 @@ using EPiServer.Core;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
 using Mediachase.Commerce.Catalog;
+using Mediachase.Commerce.Website.Search;
+using Mediachase.Search;
+using Mediachase.Search.Extensions;
 
 namespace CommerceFundamentalsWeb.Controllers
 {
@@ -36,25 +41,37 @@ namespace CommerceFundamentalsWeb.Controllers
 
         public ActionResult Search(string keyWord)
         {
-            // ToDo: SearchHelper and Criteria 
+            var filterHelper = SearchFilterHelper.Current;
 
+            var searchCriteria = filterHelper.CreateSearchCriteria(keyWord, CatalogEntrySearchCriteria.DefaultSortOrder);
+            searchCriteria.StartingRecord = 0;
+            searchCriteria.RecordsToRetrieve = 25;
+            searchCriteria.Locale = "en";
 
-            // ToDo: Search 
+            var hitCount = 0;
 
+            var searchResult = filterHelper.SearchEntries(searchCriteria);
+            var keyFieldPks = searchResult.GetKeyFieldValues<int>();
+            var searchReferences = keyFieldPks.Select(i => _referenceConverter.GetContentLink(i, CatalogContentType.CatalogEntry, 0));
+            localContent = _contentLoader.GetItems(searchReferences, new LoaderOptions());
 
-            // ToDo: Facets
+            var facetGroupsCount = searchResult.FacetGroups.Count();
+            var facetList = searchResult.FacetGroups
+                .SelectMany(f => f.Facets
+                    .Select(sf => $"{f.Name} {sf.Name} {sf.Count}"));
 
-
-            // ToDo: As a last step - un-comment and fill up the ViewModel
             var searchResultViewModel = new SearchResultViewModel();
-            /*
-            searchResultViewModel.totalHits = new List<string> { "" }; // change
-            searchResultViewModel.nodes = localContent.OfType<FashionNode>();
-            searchResultViewModel.products = localContent.OfType<FashionProduct>();
-            searchResultViewModel.variants = localContent.OfType<FashionVariation>();
-            searchResultViewModel.allContent = localContent;
-            searchResultViewModel.facets = facetList;
-            */
+
+            if (localContent != null && localContent.Any())
+            {
+                searchResultViewModel.totalHits = new List<string> { "" }; // change
+                searchResultViewModel.nodes = localContent.OfType<FashionNode>();
+                searchResultViewModel.products = localContent.OfType<ShirtProduct>();
+                searchResultViewModel.variants = localContent.OfType<ShirtVariation>();
+                searchResultViewModel.allContent = localContent;
+                searchResultViewModel.facets = facetList;
+            }
+
 
             return View(searchResultViewModel);
         }

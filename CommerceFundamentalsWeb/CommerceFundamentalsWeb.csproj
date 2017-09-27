@@ -363,6 +363,7 @@
     <Content Include="Configs\ecf.ssl.config" />
     <Content Include="Configs\Mediachase.Search.config" />
     <Content Include="App_Data\GeoLiteCity.dat" />
+    <Content Include="Configs\Mediachase.Search.Filters.config" />
     <None Include="EPiServerLog.config" />
     <Content Include="modules\_protected\EPiServer.Packaging.UI\web.config" />
     <Content Include="modules\_protected\EPiServer.Packaging.UI\EPiServer.Packaging.UI.zip" />
