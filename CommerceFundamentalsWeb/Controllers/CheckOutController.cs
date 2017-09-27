@@ -277,17 +277,10 @@ namespace CommerceFundamentalsWeb.Controllers
             {
                 if (CustomerContext.Current.CurrentContact.PreferredShippingAddress == null)
                 {
+                    var orderAddress = GetMockAddress();
                     var customerAddress = CustomerAddress.CreateInstance();
                     customerAddress.AddressType = CustomerAddressTypeEnum.Shipping;
-                    customerAddress.Name = "Default";
-                    customerAddress.FirstName = "Eirik";
-                    customerAddress.LastName = "Horvath";
-                    customerAddress.CountryCode = "47";
-                    customerAddress.CountryName = "Norway";
-                    customerAddress.RegionName = "Buskerud";
-                    customerAddress.RegionCode = "0123";
-                    customerAddress.DaytimePhoneNumber = "90048775";
-                    customerAddress.Email = "eirik@geta.no";
+                    OrderAddress.CopyOrderAddressToCustomerAddress(orderAddress, customerAddress);
 
                     CustomerContext.Current.CurrentContact.AddContactAddress(customerAddress);
                     CustomerContext.Current.CurrentContact.SaveChanges();
@@ -295,7 +288,7 @@ namespace CommerceFundamentalsWeb.Controllers
                     CustomerContext.Current.CurrentContact.PreferredShippingAddress = customerAddress;
                     CustomerContext.Current.CurrentContact.SaveChanges();
 
-                    return new OrderAddress(customerAddress);
+                    return orderAddress;
                 }
                 
                 shippingAddress = new OrderAddress(CustomerContext.Current.CurrentContact.PreferredShippingAddress);
