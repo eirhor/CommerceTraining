@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using CommerceFundamentalsWeb.Models.Pages;
 using CommerceFundamentalsWeb.Models.ViewModels;
@@ -68,11 +70,15 @@ namespace CommerceFundamentalsWeb.Controllers
 
             var promotions = _promotionEngine.Run(cart);
 
+            var totalDiscount = _orderGroupCalculator.GetOrderDiscountTotal(cart, cart.Currency);
+
             var model = new CartViewModel
             {
                 LineItems = cart.GetAllLineItems(),
                 SubTotal = _orderGroupCalculator.GetSubTotal(cart),
-                WarningMessage = warningMessages
+                WarningMessage = warningMessages,
+                DiscountMessage = GetRewardDescriptions(promotions),
+                TotalDiscount = totalDiscount.Amount
             };
 
             _orderRepository.Save(cart);
@@ -93,6 +99,16 @@ namespace CommerceFundamentalsWeb.Controllers
             string passingValue = "Coding is fun"; // could pass something of the cart instead
 
             return RedirectToAction("Index", new { node = theRef, passedAlong = passingValue }); 
+        }
+
+        private string GetRewardDescriptions(IEnumerable<RewardDescription> rewards)
+        {
+            if (rewards.Any() == false)
+            {
+                return string.Empty;
+            }
+
+            return string.Concat(rewards.Select(r => r.Description));
         }
 
         private string ValidateCart(ICart cart)

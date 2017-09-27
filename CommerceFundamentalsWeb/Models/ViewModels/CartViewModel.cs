@@ -9,5 +9,7 @@ namespace CommerceFundamentalsWeb.Models.ViewModels
         public IEnumerable<ILineItem> LineItems { get; set; }
         public Money SubTotal { get; set; }
         public string WarningMessage { get; set; }
+        public string DiscountMessage { get; set; }
+        public decimal TotalDiscount { get; set; }
     }
 }
