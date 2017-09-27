@@ -8,6 +8,7 @@ using EPiServer;
 using EPiServer.Core;
 using EPiServer.Web.Mvc;
 using EPiServer.Web.Routing;
+using Mediachase.Commerce.Core;
 using Mediachase.Commerce.Customers;
 using Mediachase.Commerce.Customers.Profile;
 using Mediachase.Commerce.Security;
@@ -56,13 +57,37 @@ namespace CommerceFundamentalsWeb.Controllers
         // ToDo: Lab incustomers module
         public ActionResult CreateAccount(AccountPage currentPage, string userName, string passWord)
         {
+            MembershipCreateStatus createStatus;
+            var membershipUser = Membership.CreateUser(userName, passWord, userName, null, null, true, out createStatus);
+
+            if (createStatus != MembershipCreateStatus.Success)
+            {
+                return null;
+            }
+
+            var customerContact = CustomerContact.CreateInstance(membershipUser);
+            customerContact.Email = customerContact.LastName = customerContact.FirstName = userName;
+            customerContact.RegistrationSource = $"{Request.Url?.Host}{SiteContext.Current}";
+
+            customerContact.SaveChanges();
+
+            SetContactProperties(customerContact);
 
             return null; // for now
         }
 
         protected void SetContactProperties(CustomerContact contact)
         {
-  
+            var organization = Organization.CreateInstance();
+            organization.Name = contact.FirstName;
+
+            organization.SaveChanges();
+
+            contact["Geography"] = "North";
+            contact.CustomerGroup = "Partner";
+            contact.OwnerId = organization.PrimaryKeyId;
+
+            contact.SaveChanges();
         }
 
         public static void CreateAuthenticationCookie(HttpContextBase httpContext, string username, string domain, bool remember)
