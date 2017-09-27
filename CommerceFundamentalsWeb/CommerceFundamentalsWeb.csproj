@@ -281,6 +281,7 @@
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ItemGroup>
+    <Compile Include="Business\RandomPriceService.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\Catalog\CatalogControllerBase.cs" />
@@ -331,9 +332,7 @@
     <Compile Include="SupportingClasses\NameAndUrls.cs" />
     <Compile Include="SupportingClasses\NodeEntryCombo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Business\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Models\Properties\_PlaceHolder.txt" />
     <Content Include="Static\css\bootstrap-collapse.js" />
