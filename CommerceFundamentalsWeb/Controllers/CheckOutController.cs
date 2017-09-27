@@ -98,7 +98,6 @@ namespace CommerceFundamentalsWeb.Controllers
                 return RedirectToAction("NoCart", "Cart");
             }
 
-            // ToDo: Add an OrderAddress
             var isAuthenticated = PrincipalInfo.CurrentPrincipal.Identity.IsAuthenticated;
 
             var orderAddress = AddAddressToOrder(cart);
@@ -118,20 +117,73 @@ namespace CommerceFundamentalsWeb.Controllers
                     OrderStatus.InProgress,
                     (item, issue) => {});
 
-                cart.ProcessPayments();
+                try
+                {
+                    cart.ProcessPayments();
+                }
+                catch (Exception ex)
+                {
+                    AdjustInventoryOrRemoveLineItem(cart);
+                    throw new InvalidOperationException("Payment failed");
+                }
+
+                var processedPayments = cart.GetFirstForm()
+                    .Payments
+                    .Where(p => p.Status.Equals(PaymentStatus.Processed.ToString()))
+                    .Sum(p => p.Amount);
+
+                var cartTotal = cart.GetTotal(_orderGroupCalculator).Amount;
+
+                if (processedPayments != cartTotal)
+                {
+                    AdjustInventoryOrRemoveLineItem(cart);
+                    throw new InvalidOperationException("Invalid payment amount");
+                }
+
+                AdjustInventoryOrRemoveLineItem(cart, OrderStatus.Completed, false);
+
+                orderReference = _orderRepository.SaveAsPurchaseOrder(cart);
+                purchaseOrder = _orderRepository.Load<IPurchaseOrder>(orderReference.OrderGroupId);
+
+                _orderRepository.Delete(cart.OrderLink);
+
+                scope.Complete();
             }
 
-            // ToDo: Housekeeping (Statuses for Shipping and PO, OrderNotes and save the order)
+            purchaseOrder.OrderStatus = OrderStatus.InProgress;
+            purchaseOrder.GetFirstShipment().OrderShipmentStatus = OrderShipmentStatus.InventoryAssigned;
 
+            var orderNote = _orderGroupFactory.CreateOrderNote(purchaseOrder);
+            orderNote.Detail = $"Ordernote text ... {purchaseOrder.GetFirstShipment().ShipmentTrackingNumber}";
+            orderNote.LineItemId = purchaseOrder.GetAllLineItems().First().LineItemId;
+            orderNote.Title = "OrderNote";
+            orderNote.Type = OrderNoteTypes.Custom.ToString();
 
-            // Final steps, navigate to the order confirmation page
+            purchaseOrder.Notes.Add(orderNote);
+
+            purchaseOrder.ExpirationDate = DateTime.Now.AddMonths(1);
+
+            _orderRepository.Save(purchaseOrder);
+
             StartPage home = _contentLoader.Get<StartPage>(ContentReference.StartPage);
             ContentReference orderPageReference = home.Settings.orderPage;
 
-            // the below is a dummy, change to "PO".OrderNumber when done
-            string passingValue = String.Empty;
+            string passingValue = purchaseOrder.OrderNumber;
 
             return RedirectToAction("Index", new { node = orderPageReference, passedAlong = passingValue });
+        }
+
+        private void AdjustInventoryOrRemoveLineItem(ICart cart, OrderStatus orderStatus = OrderStatus.Cancelled, bool saveCart = true)
+        {
+            _inventoryProcessor.AdjustInventoryOrRemoveLineItem(
+                cart.GetFirstShipment(), 
+                orderStatus, 
+                (item, issue) => {});
+
+            if (saveCart)
+            {
+                _orderRepository.Save(cart);
+            }
         }
 
         private OrderAddress GetMockAddress()
@@ -182,6 +234,7 @@ namespace CommerceFundamentalsWeb.Controllers
         private void AdjustFirstShipmentInOrder(ICart cart, IOrderAddress orderAddress, Guid selectedShip)
         {
             var shipmentMethod = ShippingManager.GetShippingMethod(selectedShip).ShippingMethod.First();
+
             var shipping = cart.GetFirstShipment();
 
             shipping.ShippingMethodId = shipmentMethod.ShippingMethodId;
@@ -271,7 +324,7 @@ namespace CommerceFundamentalsWeb.Controllers
         private IEnumerable<ShippingMethodDto.ShippingMethodRow> GetShipmentMethods()
         {
             var currentMarket = _currentMarket.GetCurrentMarket();
-            var shipmentMethods = ShippingManager.GetShippingMethodsByMarket(currentMarket.MarketName, false);
+            var shipmentMethods = ShippingManager.GetShippingMethodsByMarket(currentMarket.MarketId.Value, false);
             return shipmentMethods.ShippingMethod;
         }
 
