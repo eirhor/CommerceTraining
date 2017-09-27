@@ -9,7 +9,8 @@ namespace CommerceFundamentalsWeb.Models.ViewModels
     public class ShirtVariationViewModel
     {
 
-
+        public string Messages { get; set; }
+        public decimal DiscountPrice { get; set; }
         public string priceString { get; set; }
         public string image { get; set; }
         public string name { get; set; }

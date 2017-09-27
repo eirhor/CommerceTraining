@@ -11,11 +11,13 @@ using CommerceFundamentalsWeb.Services;
 using EPiServer;
 using EPiServer.Commerce.Catalog;
 using EPiServer.Commerce.Catalog.ContentTypes;
+using EPiServer.Commerce.Marketing;
 using EPiServer.Commerce.Order;
 using EPiServer.Core;
 using EPiServer.Globalization;
 using EPiServer.Security;
 using EPiServer.Web.Routing;
+using Mediachase.Commerce;
 using Mediachase.Commerce.Security;
 
 namespace CommerceFundamentalsWeb.Controllers.Catalog
@@ -26,30 +28,49 @@ namespace CommerceFundamentalsWeb.Controllers.Catalog
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderGroupFactory _orderGroupFactory;
         private readonly ILineItemValidator _lineItemValidator;
+        private readonly IPromotionEngine _promotionEngine;
+        private readonly ICurrentMarket _currentMarket;
 
         public ShirtVariationController(
             ICommerceService commerceService, 
             IContentLoader contentLoader,
             IOrderRepository orderRepository,
             IOrderGroupFactory orderGroupFactory,
-            ILineItemValidator lineItemValidator) : 
+            ILineItemValidator lineItemValidator, 
+            IPromotionEngine promotionEngine,
+            ICurrentMarket currentMarket) : 
             base(commerceService)
         {
             _contentLoader = contentLoader;
             _orderRepository = orderRepository;
             _orderGroupFactory = orderGroupFactory;
             _lineItemValidator = lineItemValidator;
+            _promotionEngine = promotionEngine;
+            _currentMarket = currentMarket;
         }
 
         public ActionResult Index(ShirtVariation currentContent)
         {
+            var messages = string.Empty;
+            decimal discountPrice = 0;
+
+            IEnumerable<RewardDescription> rewards = _promotionEngine.Evaluate(currentContent.ContentLink, _currentMarket);
+            if (rewards != null && rewards.Any())
+            {
+                var reward = rewards.First();
+                discountPrice = reward.SavedAmount;
+                messages = $"{reward.Description} {reward.Promotion.Description}";
+            }
+
             var model = new ShirtVariationViewModel
             {
                 name = currentContent.Name,
                 MainBody = currentContent.MainBody,
                 priceString = currentContent.GetDefaultPrice().UnitPrice.ToString(),
                 image = GetDefaultAsset(currentContent),
-                CanBeMonogrammed = currentContent.CanBeMonogrammed
+                CanBeMonogrammed = currentContent.CanBeMonogrammed,
+                Messages = messages,
+                DiscountPrice = currentContent.GetDefaultPrice().UnitPrice.Amount - discountPrice
             };
 
             return View(model);
